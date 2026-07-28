@@ -7,10 +7,17 @@
     payroll_annual_thousands: "Payroll",
     "nonemployer.establishments": "Solo shops",
     "nonemployer.receipts_thousands": "Solo receipts",
+    total_shops: "Total shops",
   };
 
   function getMetric(cat, metric) {
     if (!cat) return null;
+    if (metric === "total_shops") {
+      const emp = cat.establishments;
+      const solo = cat.nonemployer ? cat.nonemployer.establishments : null;
+      if ((emp === null || emp === undefined) && (solo === null || solo === undefined)) return null;
+      return (emp || 0) + (solo || 0);
+    }
     if (metric.startsWith("nonemployer.")) {
       const field = metric.split(".")[1];
       return cat.nonemployer ? cat.nonemployer[field] ?? null : null;
@@ -106,6 +113,11 @@
     }
     const categories = sel ? sel.categories : nationalTotals();
 
+    const stateTotalShops = Object.values(categories).reduce((sum, cat) => {
+      const v = getMetric(cat, "total_shops");
+      return v === null ? sum : sum + v;
+    }, 0);
+
     const boards = Object.entries(categories)
       .map(([code, cat]) => {
         const employerRows = [
@@ -118,6 +130,7 @@
           ["Solo/self-employed shops", formatMetric("nonemployer.establishments", nonemp.establishments)],
           ["Annual receipts", formatMetric("nonemployer.receipts_thousands", nonemp.receipts_thousands)],
         ];
+        const totalShops = getMetric(cat, "total_shops");
         const rowHtml = ([label, value]) =>
           `<div class="row"><dt>${label}</dt><dd>${value === null ? '<span class="na">withheld</span>' : value}</dd></div>`;
         return `<div class="board">
@@ -126,6 +139,7 @@
           <dl>${employerRows.map(rowHtml).join("")}</dl>
           <p class="board-group-label">No paid employees</p>
           <dl>${nonempRows.map(rowHtml).join("")}</dl>
+          <div class="row row-total"><dt>Total shops</dt><dd>${totalShops === null ? '<span class="na">withheld</span>' : fmtNumber(totalShops)}</dd></div>
         </div>`;
       })
       .join("");
@@ -135,6 +149,10 @@
         <h2>${title}</h2>
         ${rankBadge}
       </div>
+      <p class="state-total-shops">
+        <span class="state-total-shops-value">${fmtNumber(stateTotalShops)}</span>
+        total shops (employer + solo/self-employed) across barbershops, beauty salons &amp; nail salons
+      </p>
       <div class="board-grid">${boards}</div>
     `;
   }
@@ -191,6 +209,7 @@
         const totalEmp = categoryTotal(s, "employees");
         const totalPay = categoryTotal(s, "payroll_annual_thousands");
         const totalSolo = categoryTotal(s, "nonemployer.establishments");
+        const totalShops = categoryTotal(s, "total_shops");
         const cell = (v) => (v === null || v === undefined ? '<span class="na">—</span>' : fmtNumber(v));
         const isCurrent = s.state_fips === state.selectedFips;
         return `
@@ -202,11 +221,12 @@
             <td>${cell(totalEmp)}</td>
             <td>${totalPay === null ? '<span class="na">—</span>' : fmtPayroll(totalPay)}</td>
             <td>${cell(totalSolo)}</td>
+            <td class="td-total-shops">${cell(totalShops)}</td>
           </tr>`;
       })
       .join("");
 
-    els.tableBody.innerHTML = rows || `<tr><td colspan="7">No states match "${els.search.value}".</td></tr>`;
+    els.tableBody.innerHTML = rows || `<tr><td colspan="8">No states match “${els.search.value}”.</td></tr>`;
   }
 
   function renderAll() {
