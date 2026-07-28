@@ -8,6 +8,10 @@ Pass it via the CENSUS_API_KEY environment variable.
 
 Usage:
     CENSUS_API_KEY=xxxx python scripts/fetch_data.py [year]
+
+If no year is given, it defaults to CBP_YEAR below. CBP data is released
+roughly a year and a half after the reference year, so the most recent
+year is not always available yet.
 """
 import json
 import os
@@ -18,12 +22,14 @@ from datetime import datetime, timezone
 
 CBP_YEAR = os.environ.get("CBP_YEAR", "2023")
 
+# NAICS 2017 codes covering the shop-based personal grooming industry.
 NAICS_CATEGORIES = {
     "812111": "Barber Shops",
     "812112": "Beauty Salons",
     "812113": "Nail Salons",
 }
 
+# State FIPS -> (name, USPS abbreviation). The 50 states + DC.
 STATES = {
     "01": ("Alabama", "AL"), "02": ("Alaska", "AK"), "04": ("Arizona", "AZ"),
     "05": ("Arkansas", "AR"), "06": ("California", "CA"), "08": ("Colorado", "CO"),
@@ -45,19 +51,30 @@ STATES = {
 }
 
 
+def _get_json(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "barber-salon-census/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode(errors="ignore")
+        raise RuntimeError(f"Census API request failed: {e.code} {body[:300]} ({url})")
+
+
+def _to_int(v):
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def fetch_naics(year, naics_code, api_key):
+    """County Business Patterns: employer establishments, employees, payroll."""
     url = (
         f"https://api.census.gov/data/{year}/cbp"
         f"?get=ESTAB,EMP,PAYANN,NAME&for=state:*&NAICS2017={naics_code}&key={api_key}"
     )
-    req = urllib.request.Request(url, headers={"User-Agent": "barber-salon-census/1.0"})
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            raw = json.loads(resp.read().decode())
-    except urllib.error.HTTPError as e:
-        body = e.read().decode(errors="ignore")
-        raise RuntimeError(f"Census API request failed for NAICS {naics_code}: {e.code} {body[:300]}")
-
+    raw = _get_json(url)
     header, *rows = raw
     idx = {col: i for i, col in enumerate(header)}
     out = {}
@@ -65,17 +82,37 @@ def fetch_naics(year, naics_code, api_key):
         fips = row[idx["state"]]
         if fips not in STATES:
             continue
-
-        def to_int(v):
-            try:
-                return int(v)
-            except (TypeError, ValueError):
-                return None
-
         out[fips] = {
-            "establishments": to_int(row[idx["ESTAB"]]),
-            "employees": to_int(row[idx["EMP"]]),
-            "payroll_annual_thousands": to_int(row[idx["PAYANN"]]),
+            "establishments": _to_int(row[idx["ESTAB"]]),
+            "employees": _to_int(row[idx["EMP"]]),
+            "payroll_annual_thousands": _to_int(row[idx["PAYANN"]]),
+        }
+    return out
+
+
+def fetch_nonemployer(year, naics_code, api_key):
+    """Nonemployer Statistics: self-employed / no-paid-employee establishments & receipts.
+
+    NES switched its NAICS variable name to NAICS2022 starting with the 2022
+    reference year; earlier years use NAICS2017. The 812111/812112/812113
+    codes themselves are unchanged between the two revisions.
+    """
+    naics_var = "NAICS2017" if int(year) < 2022 else "NAICS2022"
+    url = (
+        f"https://api.census.gov/data/{year}/nonemp"
+        f"?get=NESTAB,NRCPTOT,NAME&for=state:*&{naics_var}={naics_code}&key={api_key}"
+    )
+    raw = _get_json(url)
+    header, *rows = raw
+    idx = {col: i for i, col in enumerate(header)}
+    out = {}
+    for row in rows:
+        fips = row[idx["state"]]
+        if fips not in STATES:
+            continue
+        out[fips] = {
+            "establishments": _to_int(row[idx["NESTAB"]]),
+            "receipts_thousands": _to_int(row[idx["NRCPTOT"]]),
         }
     return out
 
@@ -89,22 +126,40 @@ def main():
 
     year = sys.argv[1] if len(sys.argv) > 1 else CBP_YEAR
 
-    print(f"Fetching CBP {year} data for {len(NAICS_CATEGORIES)} NAICS categories...")
+    print(f"Fetching CBP {year} data (employer establishments) for {len(NAICS_CATEGORIES)} NAICS categories...")
     by_naics = {}
     for code, label in NAICS_CATEGORIES.items():
         print(f"  - {code} {label}")
         by_naics[code] = fetch_naics(year, code, api_key)
+
+    print(f"Fetching Nonemployer Statistics {year} (no-paid-employee businesses)...")
+    nonemp_by_naics = {}
+    nonemp_ok = True
+    for code, label in NAICS_CATEGORIES.items():
+        try:
+            print(f"  - {code} {label}")
+            nonemp_by_naics[code] = fetch_nonemployer(year, code, api_key)
+        except RuntimeError as e:
+            # NES is sometimes a year behind CBP -- don't fail the whole run for it.
+            print(f"    WARNING: nonemployer fetch failed for {code}: {e}", file=sys.stderr)
+            nonemp_ok = False
+            nonemp_by_naics[code] = {}
 
     states_out = []
     for fips, (name, abbr) in sorted(STATES.items(), key=lambda kv: kv[1][0]):
         categories = {}
         for code, label in NAICS_CATEGORIES.items():
             stats = by_naics[code].get(fips, {})
+            nonemp_stats = nonemp_by_naics[code].get(fips, {})
             categories[code] = {
                 "label": label,
                 "establishments": stats.get("establishments"),
                 "employees": stats.get("employees"),
                 "payroll_annual_thousands": stats.get("payroll_annual_thousands"),
+                "nonemployer": {
+                    "establishments": nonemp_stats.get("establishments"),
+                    "receipts_thousands": nonemp_stats.get("receipts_thousands"),
+                },
             }
         states_out.append({
             "state_fips": fips,
@@ -116,8 +171,13 @@ def main():
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "year": year,
-        "source": "U.S. Census Bureau, County Business Patterns",
+        "source": "U.S. Census Bureau, County Business Patterns (employer) & Nonemployer Statistics (self-employed)",
         "source_url": f"https://api.census.gov/data/{year}/cbp",
+        "nonemployer_source_url": f"https://api.census.gov/data/{year}/nonemp",
+        "nonemployer_note": None if nonemp_ok else (
+            f"Nonemployer Statistics for {year} was unavailable at fetch time for one or more "
+            "categories (NES is sometimes released later than CBP) -- those cells are blank."
+        ),
         "is_sample": False,
         "categories": NAICS_CATEGORIES,
         "states": states_out,
