@@ -206,7 +206,7 @@
       })
       .join("");
 
-    els.tableBody.innerHTML = rows || `<tr><td colspan="7">No states match “${els.search.value}”.</td></tr>`;
+    els.tableBody.innerHTML = rows || `<tr><td colspan="7">No states match "${els.search.value}".</td></tr>`;
   }
 
   function renderAll() {
