@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------
-   Tokens — Boulevard brand system
+   Tokens â€” Boulevard brand system
 --------------------------------------------------------------- */
 :root {
   --onyx:   #000000;
@@ -42,7 +42,7 @@ body {
 a { color: var(--spruce); }
 
 /* ---------------------------------------------------------------
-   Header — mirrors the deck's black cover slide
+   Header â€” mirrors the deck's black cover slide
 --------------------------------------------------------------- */
 .site-header {
   background: var(--onyx);
@@ -194,6 +194,18 @@ a { color: var(--spruce); }
   border-radius: 20px;
   padding: 4px 10px;
 }
+.state-total-shops {
+  margin: 0 0 20px;
+  font-size: .95rem;
+  color: var(--iron);
+}
+.state-total-shops-value {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--onyx);
+  margin-right: 8px;
+}
 .board-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -239,6 +251,13 @@ a { color: var(--spruce); }
 .board .row dt { color: var(--iron); font-size: .82rem; }
 .board .row dd { margin: 0; font-size: 1.05rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .board .na { color: var(--stone); font-style: italic; font-weight: 400; }
+.board .row-total {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 2px solid var(--onyx) !important;
+}
+.board .row-total dt { color: var(--onyx); font-weight: 700; font-size: .85rem; }
+.board .row-total dd { font-size: 1.15rem; color: var(--spruce); }
 
 /* ---------------------------------------------------------------
    Ranking chart
@@ -311,7 +330,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: .88rem;
-  min-width: 740px;
+  min-width: 860px;
   background: var(--white);
 }
 thead th {
@@ -336,6 +355,7 @@ tbody tr:hover { background: var(--fog); }
 tbody tr.is-current-row { background: rgba(200,171,124,.25); }
 tbody td:first-child { font-weight: 600; }
 tbody td.na { color: var(--stone); font-style: italic; }
+tbody td.td-total-shops { font-weight: 700; color: var(--spruce); }
 
 /* ---------------------------------------------------------------
    Footer
