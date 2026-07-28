@@ -1,22 +1,22 @@
 /* ---------------------------------------------------------------
-   Tokens
+   Tokens — Boulevard brand system
 --------------------------------------------------------------- */
 :root {
-  --teal-deep:  #0F2E28;
-  --teal-mid:   #1B4A40;
-  --teal-line:  #2C6356;
-  --paper:      #F2E8D5;
-  --paper-dim:  #E4D9C2;
-  --ink:        #171712;
-  --brass:      #C79A3E;
-  --brass-dim:  #8C6B27;
-  --barber-red: #A3342A;
+  --onyx:   #000000;
+  --white:  #FFFFFF;
+  --ochre:  #C8AB7C;
+  --ochre-dim: #A98A57;
+  --spruce: #183E43;
+  --spruce-line: #2C5A60;
+  --fog:    #F5F4F1;
+  --silt:   #E4E4DE;
+  --stone:  #CDC8C8;
+  --iron:   #807F7E;
 
-  --display: "Bevan", "Georgia", serif;
-  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --display: "Wix Madefor Display", "Helvetica Neue", Arial, sans-serif;
+  --body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", "SF Mono", monospace;
 
-  --pole-width: 14px;
   --radius: 10px;
 }
 
@@ -26,9 +26,8 @@ html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  padding-left: var(--pole-width);
-  background: var(--teal-deep);
-  color: var(--paper);
+  background: var(--fog);
+  color: var(--onyx);
   font-family: var(--body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -40,43 +39,22 @@ body {
   padding: 0 24px;
 }
 
-a { color: var(--brass); }
+a { color: var(--spruce); }
 
 /* ---------------------------------------------------------------
-   Signature element: the barber pole rail
---------------------------------------------------------------- */
-.pole-rail {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--pole-width);
-  z-index: 50;
-  background: repeating-linear-gradient(
-    -35deg,
-    var(--barber-red) 0 10px,
-    var(--paper) 10px 20px,
-    var(--teal-line) 20px 30px,
-    var(--paper) 30px 40px
-  );
-  background-size: 56px 56px;
-  box-shadow: 2px 0 12px rgba(0,0,0,.35);
-  animation: pole-spin 6s linear infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .pole-rail { animation: none; }
-}
-@keyframes pole-spin {
-  from { background-position: 0 0; }
-  to   { background-position: 0 56px; }
-}
-
-/* ---------------------------------------------------------------
-   Header
+   Header — mirrors the deck's black cover slide
 --------------------------------------------------------------- */
 .site-header {
-  padding: 56px 0 32px;
-  border-bottom: 1px solid var(--teal-line);
+  background: var(--onyx);
+  padding: 56px 0 40px;
+}
+.logo-lockup {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: .18em;
+  color: var(--white);
+  margin-bottom: 28px;
 }
 .eyebrow {
   display: inline-block;
@@ -84,21 +62,21 @@ a { color: var(--brass); }
   font-size: 12px;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--brass);
+  color: var(--ochre);
 }
 .wordmark {
   font-family: var(--display);
-  font-weight: 400;
+  font-weight: 800;
   font-size: clamp(2.4rem, 5vw, 4rem);
   line-height: 1.02;
-  margin: 10px 0 6px;
-  color: var(--paper);
-  text-shadow: 2px 2px 0 var(--barber-red);
+  margin: 14px 0 10px;
+  color: var(--white);
 }
+.wordmark .accent { color: var(--ochre); }
 .tagline {
   margin: 0;
   max-width: 46ch;
-  color: var(--paper-dim);
+  color: var(--stone);
   font-size: 1.05rem;
 }
 
@@ -106,14 +84,14 @@ a { color: var(--brass); }
    Sample data banner
 --------------------------------------------------------------- */
 .sample-banner {
-  background: var(--barber-red);
-  color: var(--paper);
+  background: var(--ochre);
+  color: var(--onyx);
   font-size: .92rem;
   padding: 10px 0;
 }
 .sample-banner .wrap { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
 .sample-banner code {
-  background: rgba(0,0,0,.2);
+  background: rgba(0,0,0,.12);
   padding: 1px 6px;
   border-radius: 4px;
   font-family: var(--mono);
@@ -125,8 +103,8 @@ a { color: var(--brass); }
 .finder {
   margin-top: 40px;
   padding: 24px;
-  background: var(--teal-mid);
-  border: 1px solid var(--teal-line);
+  background: var(--white);
+  border: 1px solid var(--silt);
   border-radius: var(--radius);
 }
 .finder-label {
@@ -135,7 +113,7 @@ a { color: var(--brass); }
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: .08em;
-  color: var(--brass);
+  color: var(--iron);
   margin-bottom: 10px;
 }
 .finder-row {
@@ -146,9 +124,9 @@ a { color: var(--brass); }
 }
 #state-search {
   flex: 1 1 260px;
-  background: var(--paper);
-  color: var(--ink);
-  border: 2px solid transparent;
+  background: var(--fog);
+  color: var(--onyx);
+  border: 2px solid var(--silt);
   border-radius: 6px;
   padding: 12px 14px;
   font-size: 1.05rem;
@@ -156,11 +134,11 @@ a { color: var(--brass); }
 }
 #state-search:focus-visible {
   outline: none;
-  border-color: var(--brass);
+  border-color: var(--ochre);
 }
 .metric-toggle {
   display: flex;
-  border: 1px solid var(--teal-line);
+  border: 1px solid var(--silt);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -170,26 +148,26 @@ a { color: var(--brass); }
   letter-spacing: .04em;
   text-transform: uppercase;
   background: transparent;
-  color: var(--paper-dim);
+  color: var(--iron);
   border: none;
   padding: 12px 14px;
   cursor: pointer;
-  border-right: 1px solid var(--teal-line);
+  border-right: 1px solid var(--silt);
 }
 .metric-btn:last-child { border-right: none; }
 .metric-btn.is-active {
-  background: var(--brass);
-  color: var(--ink);
+  background: var(--ochre);
+  color: var(--onyx);
 }
-.metric-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: -2px; }
+.metric-btn:focus-visible { outline: 2px solid var(--ochre); outline-offset: -2px; }
 .finder-hint {
   margin: 12px 0 0;
   font-size: .85rem;
-  color: var(--paper-dim);
+  color: var(--iron);
 }
 
 /* ---------------------------------------------------------------
-   Detail cards (the "price list boards")
+   Detail cards
 --------------------------------------------------------------- */
 .detail {
   margin-top: 32px;
@@ -203,15 +181,16 @@ a { color: var(--brass); }
 }
 .detail-heading h2 {
   font-family: var(--display);
+  font-weight: 700;
   font-size: 1.8rem;
   margin: 0;
-  color: var(--paper);
+  color: var(--onyx);
 }
 .detail-heading .rank-badge {
   font-family: var(--mono);
   font-size: 12px;
-  color: var(--brass);
-  border: 1px solid var(--brass-dim);
+  color: var(--spruce);
+  border: 1px solid var(--spruce);
   border-radius: 20px;
   padding: 4px 10px;
 }
@@ -224,40 +203,42 @@ a { color: var(--brass); }
   .board-grid { grid-template-columns: 1fr; }
 }
 .board {
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--white);
+  color: var(--onyx);
   border-radius: var(--radius);
   padding: 20px 22px;
   position: relative;
   overflow: hidden;
-}
-.board::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 5px;
-  background: repeating-linear-gradient(
-    -35deg, var(--barber-red) 0 6px, var(--paper) 6px 12px, var(--teal-line) 12px 18px, var(--paper) 18px 24px
-  );
+  border-top: 4px solid var(--ochre);
 }
 .board h3 {
   font-family: var(--display);
+  font-weight: 700;
   font-size: 1.2rem;
   margin: 6px 0 14px;
 }
 .board dl { margin: 0; }
+.board-group-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--iron);
+  margin: 14px 0 2px;
+}
+.board-group-label:first-of-type { margin-top: 6px; }
 .board .row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   padding: 9px 0;
-  border-bottom: 1px dashed var(--paper-dim);
+  border-bottom: 1px dashed var(--silt);
   font-family: var(--mono);
 }
 .board .row:last-child { border-bottom: none; }
-.board .row dt { color: var(--brass-dim); font-size: .82rem; }
+.board .row dt { color: var(--iron); font-size: .82rem; }
 .board .row dd { margin: 0; font-size: 1.05rem; font-weight: 600; font-variant-numeric: tabular-nums; }
-.board .na { color: #999; font-style: italic; font-weight: 400; }
+.board .na { color: var(--stone); font-style: italic; font-weight: 400; }
 
 /* ---------------------------------------------------------------
    Ranking chart
@@ -265,10 +246,11 @@ a { color: var(--brass); }
 .rank-section { margin-top: 48px; }
 .rank-head h2 {
   font-family: var(--display);
+  font-weight: 700;
   font-size: 1.5rem;
   margin: 0 0 4px;
 }
-.muted { color: var(--paper-dim); font-size: .9rem; margin: 0 0 18px; }
+.muted { color: var(--iron); font-size: .9rem; margin: 0 0 18px; }
 .rank-chart {
   display: flex;
   flex-direction: column;
@@ -283,32 +265,32 @@ a { color: var(--brass); }
 .rank-row .rank-name {
   font-size: .85rem;
   text-align: right;
-  color: var(--paper-dim);
+  color: var(--iron);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.rank-row.is-current .rank-name { color: var(--paper); font-weight: 600; }
+.rank-row.is-current .rank-name { color: var(--onyx); font-weight: 600; }
 .rank-bar-track {
-  background: var(--teal-mid);
+  background: var(--silt);
   border-radius: 4px;
   height: 16px;
   overflow: hidden;
 }
 .rank-bar-fill {
   height: 100%;
-  background: var(--brass-dim);
+  background: var(--ochre-dim);
   border-radius: 4px 0 0 4px;
 }
-.rank-row.is-current .rank-bar-fill { background: var(--barber-red); }
+.rank-row.is-current .rank-bar-fill { background: var(--spruce); }
 .rank-row .rank-value {
   font-family: var(--mono);
   font-size: .82rem;
-  color: var(--paper-dim);
+  color: var(--iron);
   font-variant-numeric: tabular-nums;
 }
-.rank-row.is-current .rank-value { color: var(--paper); }
-.rank-more { font-size: .8rem; color: var(--paper-dim); margin-top: 6px; }
+.rank-row.is-current .rank-value { color: var(--onyx); }
+.rank-more { font-size: .8rem; color: var(--iron); margin-top: 6px; }
 
 /* ---------------------------------------------------------------
    Data table
@@ -316,19 +298,21 @@ a { color: var(--brass); }
 .table-section { margin: 48px 0 64px; }
 .table-head h2 {
   font-family: var(--display);
+  font-weight: 700;
   font-size: 1.5rem;
   margin: 0 0 4px;
 }
 .table-scroll {
   overflow-x: auto;
-  border: 1px solid var(--teal-line);
+  border: 1px solid var(--silt);
   border-radius: var(--radius);
 }
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: .88rem;
-  min-width: 640px;
+  min-width: 740px;
+  background: var(--white);
 }
 thead th {
   text-align: left;
@@ -336,30 +320,30 @@ thead th {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .04em;
-  color: var(--brass);
-  background: var(--teal-mid);
+  color: var(--white);
+  background: var(--spruce);
   padding: 10px 14px;
   position: sticky;
   top: 0;
 }
-.th-sub { color: var(--paper-dim); font-weight: 400; text-transform: none; }
+.th-sub { color: var(--stone); font-weight: 400; text-transform: none; }
 tbody td {
   padding: 9px 14px;
-  border-top: 1px solid var(--teal-line);
+  border-top: 1px solid var(--silt);
   font-variant-numeric: tabular-nums;
 }
-tbody tr:hover { background: rgba(199,154,62,.08); }
-tbody tr.is-current-row { background: rgba(163,52,42,.18); }
+tbody tr:hover { background: var(--fog); }
+tbody tr.is-current-row { background: rgba(200,171,124,.25); }
 tbody td:first-child { font-weight: 600; }
-tbody td.na { color: #7f8f8a; font-style: italic; }
+tbody td.na { color: var(--stone); font-style: italic; }
 
 /* ---------------------------------------------------------------
    Footer
 --------------------------------------------------------------- */
 .site-footer {
-  border-top: 1px solid var(--teal-line);
+  border-top: 1px solid var(--silt);
   padding: 28px 0 60px;
   font-size: .82rem;
-  color: var(--paper-dim);
+  color: var(--iron);
 }
 .site-footer p { margin: 0 0 8px; }
